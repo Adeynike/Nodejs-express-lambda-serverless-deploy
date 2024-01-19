@@ -1,0 +1,26 @@
+service: serverless-nodejs-app
+
+custom: # add these two lines
+  secrets: ${file(secrets.json)} # reference the secrets.json file
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: production # make sure to change this to production
+  region: us-east-1
+  environment: # add environment property
+    NODE_ENV: ${self:custom.secrets.NODE_ENV} 
+    # reference the NODE_ENV from the secrets.json file
+
+functions:
+  app:
+    handler: app.server
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
